@@ -4,18 +4,21 @@ import random
 class GeneticAlgorithm:
     cities = []
     distance_matrix = []
+    items = []
     population_size = 0
     num_generations = 0
     mutation_rate = 0
+    capacity_of_knapsack = 0
 
-    def __init__(self, cities, distance_matrix, population_size, num_generations, mutation_rate):
+    def __init__(self, cities, distance_matrix, population_size, num_generations, mutation_rate, capacity_of_knapsack = 0, items = []):
         self.cities = cities
         self.distance_matrix = distance_matrix
         self.population_size = population_size
         self.num_generations = num_generations
         self.mutation_rate = mutation_rate
+        self.capacity_of_knapsack = capacity_of_knapsack
 
-    def run(self):
+    def runTSP(self):
         num_generations = self.num_generations
         mutation_rate = self.mutation_rate
         
@@ -51,16 +54,24 @@ class GeneticAlgorithm:
 
         return best_individual
     
+    def runKNP(self):
+        # tbd
+        return self.items
+    
 # greedy algorithm class
 class GreedyAlgorithm:
     cities = []
     distance_matrix = []
+    capacity_of_knapsack = 0
+    items = []
 
-    def __init__(self, cities, distance_matrix):
+    def __init__(self, cities, distance_matrix, capacity_of_knapsack = 0, items = []):
         self.cities = cities
         self.distance_matrix = distance_matrix
+        self.capacity_of_knapsack = capacity_of_knapsack
+        self.items = items
 
-    def run(self):
+    def runTSP(self):
         # Start with a random city
         current_city = random.choice(self.cities)
         unvisited_cities = self.cities.copy()
@@ -75,16 +86,58 @@ class GreedyAlgorithm:
             current_city = next_city
 
         return path
+    
+    def runKNP(self):
+        # Sort items by profit/weight ratio
+        sorted_items = sorted(self.items, key=lambda item: item[1]/item[2], reverse=True)
+        knapsack = []
+        knapsack_weight = 0
+        knapsack_value = 0
+
+        # Add items to knapsack
+        for item in sorted_items:
+            if knapsack_weight + item[2] <= self.capacity_of_knapsack:
+                knapsack.append(item)
+                knapsack_weight += item[2]
+                knapsack_value += item[1]
+        return knapsack
 
 # random algorithm class
 class RandomAlgorithm:
     cities = []
+    distance_matrix = []
+    capacity_of_knapsack = 0
+    items = []
+    num_generations = 0
+    population_size = 0
 
-    def __init__(self, cities):
+    def __init__(self, cities, distance_matrix , capacity_of_knapsack = 0, items = [], num_generations = 1, population_size = 1):
         self.cities = cities
+        self.distance_matrix = distance_matrix
+        self.capacity_of_knapsack = capacity_of_knapsack
+        self.items = items
+        self.num_generations = num_generations
+        self.population_size = population_size
 
-    def run(self):
-        return random.sample(self.cities, len(self.cities))
+    def runTSP(self):
+        solutions = []
+        while len(solutions) < self.num_generations * self.population_size:
+            solution = random.sample(self.cities, len(self.cities))
+            solutions.append(solution)
+        return max(solutions, key=lambda solution: calculate_fitness(solution, self.distance_matrix))
+
+    def is_knapsack_valid(self, knapsack, capacity_of_knapsack):
+        total_weight = sum(item[2] for item in knapsack)
+        return total_weight <= capacity_of_knapsack
+
+    def runKNP(self):
+        solutions = []
+        while len(solutions) < self.num_generations * self.population_size:
+            solution = random.sample(self.items, len(self.items))
+            while not (self.is_knapsack_valid(solution, self.capacity_of_knapsack)):
+                solution = random.sample(self.items, len(self.items))
+            solutions.append(solution)
+        return max(solutions, key=lambda solution: sum(item[1] for item in solution))
 
 def calculate_fitness(individual, distance_matrix):
     total_distance = 0

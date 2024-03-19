@@ -19,6 +19,7 @@ max_speed = float("-inf")
 capacity_of_knapsack = 0
 cities = []
 distance_matrix = []
+items = []
 
 if len(file_list) > 0:
     file_name = file_list[file_number]
@@ -35,12 +36,18 @@ if len(file_list) > 0:
             elif line.startswith("CAPACITY OF KNAPSACK:"):
                 capacity_of_knapsack = int(line.split(":")[1])
             elif line.startswith("NODE_COORD_SECTION"):
-                # read the next lines until "DEMAND_SECTION" is found
                 for line in file:
-                    if line.startswith("DEMAND_SECTION") or line.startswith("ITEMS SECTION") or line.startswith("DEPOT_SECTION") or line.startswith("DEPOT_SECTION"):
-                        break
-                    city, x, y = line.split()
-                    cities.append((city, (float(x), float(y))))
+                    if line.startswith("ITEMS SECTION"):
+                        for line in file:
+                            if line.startswith("EOF"):
+                                break
+                            else:
+                                item, profit, weight, assigned_node = line.split()
+                                items.append((item, int(profit), int(weight), int(assigned_node)))
+                    else:
+                        city, x, y = line.split()
+                        cities.append((city, (float(x), float(y))))
+                
 else:
     print("No files found in the folder.")
 
@@ -57,28 +64,29 @@ arguments = [cities, distance_matrix, population_size, num_generations, mutation
 
 # Run the genetic algorithm
 EA = GeneticAlgorithm(*arguments)
-GA = GreedyAlgorithm(cities, distance_matrix)
-RA = RandomAlgorithm(cities)
+GA = GreedyAlgorithm(cities, distance_matrix, items=items, capacity_of_knapsack=capacity_of_knapsack)
+RA = RandomAlgorithm(cities, distance_matrix)
 
-start_time = time.time()
-best_individualEA = EA.run()
-end = time.time()
-print("Time: EA", end - start_time)
+# start_time = time.time()
+# best_individualEA = EA.runTSP()
+# end = time.time()
+# print("Time: EA", end - start_time)
 
-start_time = time.time()
-best_individualGA = GA.run()
-end = time.time()
-print("Time GA:", end - start_time)
+# start_time = time.time()
+# best_individualGA = GA.runTSP()
+# end = time.time()
+# print("Time GA:", end - start_time)
 
-start_time = time.time()
-best_individualRA = RA.run()
-end = time.time()
-print("Time RA:", end - start_time)
+# start_time = time.time()
+# best_individualRA = RA.runTSP()
+# end = time.time()
+# print("Time RA:", end - start_time)
 
-# Print the best individual and its fitness score
-# print_individual(best_individual)
-# print("Best Individual:", best_individual)
-print("Fitness Score EA:", calculate_fitness(best_individualEA, distance_matrix))
-print("Fitness Score GA:", calculate_fitness(best_individualGA, distance_matrix))
-print("Fitness Score RA:", calculate_fitness(best_individualRA, distance_matrix))
+algorithms = [EA, GA, RA]
+for algorithm in algorithms:
+    fitness_score = calculate_fitness(algorithm.runTSP(), distance_matrix)
+    print(f"Fitness Score [{algorithm.__class__.__name__}]: {fitness_score}")
 
+# for algorithm in algorithms:
+#     fitness_score = sum(item[1] for item in algorithm.runKNP())
+#     print(f"Fitness Score [{algorithm.__class__.__name__}
