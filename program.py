@@ -1,11 +1,9 @@
 import os
-import random
 import time
 from algorithms import *
 from algorithms import GeneticAlgorithm
 from algorithms import GreedyAlgorithm
 from algorithms import RandomAlgorithm
-
 
 folder_path = "instances/a280-ttp"
 file_list = os.listdir(folder_path)
