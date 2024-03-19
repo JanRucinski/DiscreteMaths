@@ -107,7 +107,7 @@ def selection(population, fitness_scores):
     parents = []
     for _ in range(len(population)):
         tournament = random.sample(list(zip(population, fitness_scores)), tournament_size)
-        winner = max(tournament, key=lambda x: x[1])[0]
+        winner = min(tournament, key=lambda x: x[1])[0]
         parents.append(winner)
     return parents
 
