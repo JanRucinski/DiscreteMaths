@@ -101,14 +101,6 @@ def generate_population(population_size, cities):
         population.append(individual)
     return population
 
-def fitnessCalculate(individual, distance_matrix):
-    total_distance = 0
-    for i in range(len(individual)-1):
-        city1 = individual[i]
-        city2 = individual[i+1]
-        total_distance += distance_matrix[int(city1[0])-1][int(city2[0])-1]
-    return total_distance
-
 def selection(population, fitness_scores):
     # Select parents using tournament selection
     tournament_size = 5
