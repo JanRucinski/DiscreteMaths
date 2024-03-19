@@ -1,6 +1,6 @@
 import random
 
-# make a genetic algorithm class
+# genetic algorithm class
 class GeneticAlgorithm:
     cities = []
     distance_matrix = []
@@ -51,7 +51,40 @@ class GeneticAlgorithm:
 
         return best_individual
     
-  
+# greedy algorithm class
+class GreedyAlgorithm:
+    cities = []
+    distance_matrix = []
+
+    def __init__(self, cities, distance_matrix):
+        self.cities = cities
+        self.distance_matrix = distance_matrix
+
+    def run(self):
+        # Start with a random city
+        current_city = random.choice(self.cities)
+        unvisited_cities = self.cities.copy()
+        unvisited_cities.remove(current_city)
+        path = [current_city]
+
+        # Visit each city
+        while unvisited_cities:
+            next_city = min(unvisited_cities, key=lambda city: self.distance_matrix[int(current_city[0])-1][int(city[0])-1])
+            path.append(next_city)
+            unvisited_cities.remove(next_city)
+            current_city = next_city
+
+        return path
+
+# random algorithm class
+class RandomAlgorithm:
+    cities = []
+
+    def __init__(self, cities):
+        self.cities = cities
+
+    def run(self):
+        return random.sample(self.cities, len(self.cities))
 
 def calculate_fitness(individual, distance_matrix):
     total_distance = 0

@@ -3,6 +3,8 @@ import random
 import time
 from algorithms import *
 from algorithms import GeneticAlgorithm
+from algorithms import GreedyAlgorithm
+from algorithms import RandomAlgorithm
 
 
 folder_path = "instances/a280-ttp"
@@ -57,15 +59,28 @@ arguments = [cities, distance_matrix, population_size, num_generations, mutation
 
 # Run the genetic algorithm
 EA = GeneticAlgorithm(*arguments)
+GA = GreedyAlgorithm(cities, distance_matrix)
+RA = RandomAlgorithm(cities)
 
 start_time = time.time()
-best_individual = EA.run()
+best_individualEA = EA.run()
 end = time.time()
-print("Time:", end - start_time)
+print("Time: EA", end - start_time)
 
+start_time = time.time()
+best_individualGA = GA.run()
+end = time.time()
+print("Time GA:", end - start_time)
+
+start_time = time.time()
+best_individualRA = RA.run()
+end = time.time()
+print("Time RA:", end - start_time)
 
 # Print the best individual and its fitness score
 # print_individual(best_individual)
 # print("Best Individual:", best_individual)
-print("Fitness Score:", calculate_fitness(best_individual, distance_matrix))
+print("Fitness Score EA:", calculate_fitness(best_individualEA, distance_matrix))
+print("Fitness Score GA:", calculate_fitness(best_individualGA, distance_matrix))
+print("Fitness Score RA:", calculate_fitness(best_individualRA, distance_matrix))
 
