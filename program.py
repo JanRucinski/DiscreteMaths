@@ -63,9 +63,9 @@ for i in range(len(cities)):
 arguments = [cities, distance_matrix, population_size, num_generations, mutation_rate]
 
 # Run the genetic algorithm
-EA = GeneticAlgorithm(*arguments)
-GA = GreedyAlgorithm(cities, distance_matrix, items=items, capacity_of_knapsack=capacity_of_knapsack)
-RA = RandomAlgorithm(cities, distance_matrix)
+EA = GeneticAlgorithm(cities, distance_matrix, population_size, num_generations, mutation_rate, capacity_of_knapsack, items)
+GA = GreedyAlgorithm(cities, distance_matrix, capacity_of_knapsack, items)
+RA = RandomAlgorithm(cities, distance_matrix , capacity_of_knapsack, items, num_generations, population_size)
 
 # start_time = time.time()
 # best_individualEA = EA.runTSP()
@@ -83,10 +83,13 @@ RA = RandomAlgorithm(cities, distance_matrix)
 # print("Time RA:", end - start_time)
 
 algorithms = [EA, GA, RA]
-for algorithm in algorithms:
-    fitness_score = calculate_fitness(algorithm.runTSP(), distance_matrix)
-    print(f"Fitness Score [{algorithm.__class__.__name__}]: {fitness_score}")
+# for algorithm in algorithms:
+#     fitness_score = calculate_fitness(algorithm.runTSP(), distance_matrix)
+#     print(f"Fitness Score TSP [{algorithm.__class__.__name__}]: {fitness_score}")
 
 # for algorithm in algorithms:
 #     fitness_score = sum(item[1] for item in algorithm.runKNP())
-#     print(f"Fitness Score [{algorithm.__class__.__name__}
+#     print(f"Fitness Score KNP [{algorithm.__class__.__name__}]: {fitness_score}")
+
+print(GA.runTTP())
+print(RA.runTTP())
