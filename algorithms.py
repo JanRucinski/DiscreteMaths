@@ -9,9 +9,12 @@ class GeneticAlgorithm:
     num_generations = 0
     mutation_rate = 0
     capacity_of_knapsack = 0
+    Vmax = 1
+    Vmin = 0.1
 
     def __init__(self, cities, distance_matrix, population_size, 
-                 num_generations, mutation_rate, capacity_of_knapsack = 0, items = []):
+                 num_generations, mutation_rate, capacity_of_knapsack = 0, 
+                 items = [], Vmax = 1, Vmin = 0.1):
         self.cities = cities
         self.distance_matrix = distance_matrix
         self.population_size = population_size
@@ -19,6 +22,8 @@ class GeneticAlgorithm:
         self.mutation_rate = mutation_rate
         self.capacity_of_knapsack = capacity_of_knapsack
         self.items = items
+        self.Vmax = Vmax
+        self.Vmin = Vmin
 
     def runTSP(self):
         num_generations = self.num_generations
@@ -90,18 +95,66 @@ class GeneticAlgorithm:
             print("Invalid knapsack")
         
         return best_individual
+    
+    def runTTP(self):
+        num_generations = self.num_generations
+        mutation_rate = self.mutation_rate
+        population_size = self.population_size
+        def fitness(individual):
+            total_profit = 0
+            current_city = individual[0][3]
+            knapsack_weight = individual[0][2]
+
+            for item in individual[1:]:
+                if knapsack_weight + item[2] <= self.capacity_of_knapsack:
+                    speed = calculate_speed(self.Vmax, self.Vmin, knapsack_weight, self.capacity_of_knapsack)
+                    distance = self.distance_matrix[current_city-1][item[3]-1]
+                    total_profit += item[1] - (distance / speed)
+                    current_city = item[3]
+                    knapsack_weight += item[2]
+            return total_profit
+
+        # Generate initial population
+        population = generate_population_knapsack(population_size, 
+                                                  self.items, self.capacity_of_knapsack)
+
+        for generation in range(num_generations):
+            # Evaluate fitness of each individual in the population
+            fitness_scores = [fitness(individual) for individual in population]
+
+            # Select parents for reproduction
+            parents = selection_TTP(population, fitness_scores)
+
+            # Create offspring through crossover
+            offspring = crossover(parents)
+
+            # Mutate offspring
+            mutated_offspring = mutation(offspring, mutation_rate)
+
+            # Replace population with offspring
+            population = mutated_offspring
+        
+        # Select the best individual as the solution
+        best_individual = max(population, key=fitness)
+
+        return fitness(best_individual)
         
     
 # greedy algorithm class
 class GreedyAlgorithm:
     cities = []
     distance_matrix = []
-    capacity_of_knapsack = 0
     items = []
+    population_size = 0
+    num_generations = 0
+    mutation_rate = 0
+    capacity_of_knapsack = 0
     Vmax = 1
     Vmin = 0.1
 
-    def __init__(self, cities, distance_matrix, capacity_of_knapsack = 0, items = [], Vmax = 1, Vmin = 0.1):
+    def __init__(self, cities, distance_matrix, population_size, 
+                 num_generations, mutation_rate, capacity_of_knapsack = 0, 
+                 items = [], Vmax = 1, Vmin = 0.1):
         self.cities = cities
         self.distance_matrix = distance_matrix
         self.capacity_of_knapsack = capacity_of_knapsack
@@ -116,7 +169,7 @@ class GreedyAlgorithm:
         unvisited_cities.remove(current_city)
         path = [current_city]
 
-        # Visit each city
+        # Visit each city by closest distance
         while unvisited_cities:
             next_city = min(unvisited_cities, key=lambda city: 
                             self.distance_matrix[int(current_city[0])-1][int(city[0])-1])
@@ -164,15 +217,17 @@ class GreedyAlgorithm:
 class RandomAlgorithm:
     cities = []
     distance_matrix = []
-    capacity_of_knapsack = 0
     items = []
-    num_generations = 0
     population_size = 0
+    num_generations = 0
+    mutation_rate = 0
+    capacity_of_knapsack = 0
     Vmax = 1
     Vmin = 0.1
 
-    def __init__(self, cities, distance_matrix , capacity_of_knapsack = 0, items = [], 
-                 num_generations = 1, population_size = 1, Vmax = 1, Vmin = 0.1):
+    def __init__(self, cities, distance_matrix, population_size, 
+                 num_generations, mutation_rate, capacity_of_knapsack = 0, 
+                 items = [], Vmax = 1, Vmin = 0.1):
         self.cities = cities
         self.distance_matrix = distance_matrix
         self.capacity_of_knapsack = capacity_of_knapsack
@@ -239,7 +294,7 @@ def generate_population_knapsack(population_size, items, capacity_of_knapsack):
 
 def is_knapsack_valid(knapsack, capacity_of_knapsack):
     total_weight = sum(item[2] for item in knapsack)
-    return total_weight <= capacity_of_knapsack
+    return total_weight <= capacity_of_knapsack and total_weight > 0
 
 def selection(population, fitness_scores):
     # Select parents using tournament selection
@@ -252,8 +307,19 @@ def selection(population, fitness_scores):
         parents.append(winner)
     return parents
 
+def selection_TTP(population, fitness_scores):
+    # Select parents using tournament selection
+    tournament_size = 5
+    parents = []
+    for _ in range(len(population)):
+        tournament = random.sample(list(zip(population, fitness_scores)), 
+                                   tournament_size)
+        winner = max(tournament, key=lambda x: x[1])[0]
+        parents.append(winner)
+    return parents
+
 def crossover(parents):
-    # Perform random crossover
+    # Perform crossover
     offspring = []
     for i in range(0, len(parents), 2):
         parent1 = parents[i]

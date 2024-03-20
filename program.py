@@ -60,12 +60,12 @@ for i in range(len(cities)):
         row.append(distance(cities[i], cities[j]))
     distance_matrix.append(row)
 
-arguments = [cities, distance_matrix, population_size, num_generations, mutation_rate]
+arguments = [cities, distance_matrix, population_size, num_generations, mutation_rate, capacity_of_knapsack, items, max_speed, min_speed]
 
 # Run the genetic algorithm
-EA = GeneticAlgorithm(cities, distance_matrix, population_size, num_generations, mutation_rate, capacity_of_knapsack, items)
-GA = GreedyAlgorithm(cities, distance_matrix, capacity_of_knapsack, items)
-RA = RandomAlgorithm(cities, distance_matrix , capacity_of_knapsack, items, num_generations, population_size)
+EA = GeneticAlgorithm(*arguments.copy())
+GA = GreedyAlgorithm(*arguments.copy())
+RA = RandomAlgorithm(*arguments.copy())
 
 # start_time = time.time()
 # best_individualEA = EA.runTSP()
@@ -93,3 +93,4 @@ algorithms = [EA, GA, RA]
 
 print(GA.runTTP())
 print(RA.runTTP())
+print(EA.runTTP())
