@@ -1,4 +1,6 @@
+import datetime
 import random
+import statistics
 
 # genetic algorithm class
 class Algorithms:
@@ -98,6 +100,7 @@ class Algorithms:
         return self.calculate_fitness_knapsack(best_individual)
     
     def runTTP_Evolutionary(self):
+        generations_summary = []
         num_generations = self.num_generations
         mutation_rate = self.mutation_rate
         population_size = self.population_size
@@ -118,11 +121,12 @@ class Algorithms:
         # Generate initial population
         population = generate_population_knapsack(population_size, 
                                                   self.items, self.capacity_of_knapsack)
-
+        counter = 0
         for generation in range(num_generations):
             # Evaluate fitness of each individual in the population
             fitness_scores = [fitness(individual) for individual in population]
-
+            generations_summary.append([counter, max(fitness_scores), min(fitness_scores), sum(fitness_scores)/len(fitness_scores)])
+            counter += 1
             # Select parents for reproduction
             parents = selection_TTP(population, fitness_scores)
 
@@ -137,6 +141,15 @@ class Algorithms:
         
         # Select the best individual as the solution
         best_individual = max(population, key=fitness)
+
+        # write generations_summary to a file
+        # name of file is generations_summary + current time without spaces + .txt
+        name_of_file = "generations_summary" + str(datetime.datetime.now()).replace(" ", "").replace(":", "").replace(".", "") + ".txt"
+        
+        # with open("generations/" + str(name_of_file), "w") as file:
+        #     file.write("Generation Max Min Average\n")
+        #     for line in generations_summary:
+        #         file.write(f"{line[0]} {line[1]} {line[2]} {line[3]} \n")
 
         return fitness(best_individual)
         
