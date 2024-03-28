@@ -75,58 +75,12 @@ for i in range(7):
     start_time = time.time()
 
     for i in range(10):
-        run_algorithms_TTP([Solver.runTTP_Evolutionary, Solver.runTTP_Greedy, Solver.runTTP_Random])
-        
+        run_algorithms_TTP([Solver.runTTP_Evolutionary, Solver.runTTP_Greedy, Solver.runTTP_Random, Solver.runTTP_SA])
+
     end = time.time()
     print("Time:", end - start_time)
 
-# create a csv file with the results
 with open("results_" + file_name + ".csv", "w") as file:
     file.write("Algorithm, Fitness Score, Instance\n")
     for result in results:
         file.write(f"{result[0]}, {int(result[1])}, {result[2]}\n")
-
-# for i in range(10):
-#     print(f"Running iteration {i+1}")
-#     results.append(["TTP","Evolutionary", Solver.runTTP_Evolutionary()])
-#     results.append(["TTP","Greedy", Solver.runTTP_Greedy()])
-#     results.append(["TTP","Random", Solver.runTTP_Random()])
-#     results.append(["TSP","Evolutionary", Solver.runTSP_Evolutionary()])
-#     results.append(["TSP","Greedy", Solver.runTSP_Greedy()])
-#     results.append(["TSP","Random", Solver.runTSP_Random()])
-#     results.append(["KNP","Evolutionary", Solver.runKNP_Evolutionary()])
-#     results.append(["KNP","Greedy", Solver.runKNP_Greedy()])
-#     results.append(["KNP","Random", Solver.runKNP_Random()])
-
-# # create a csv file with the results
-# with open("results.csv", "w") as file:
-#     file.write("Problem, Algorithm, Fitness Score\n")
-#     for result in results:
-#         file.write(f"{result[0]}, {result[1]}, {result[2]}\n")
-
-
-
-
-# start_time = time.time()
-# best_individualEA = EA.runTSP()
-# end = time.time()
-# print("Time: EA", end - start_time)
-
-# start_time = time.time()
-# best_individualGA = GA.runTSP()
-# end = time.time()
-# print("Time GA:", end - start_time)
-
-# start_time = time.time()
-# best_individualRA = RA.runTSP()
-# end = time.time()
-# print("Time RA:", end - start_time)
-
-# algorithms = [EA, GA, RA]
-# for algorithm in algorithms:
-#     fitness_score = calculate_fitness(algorithm.runTSP(), distance_matrix)
-#     print(f"Fitness Score TSP [{algorithm.__class__.__name__}]: {fitness_score}")
-
-# for algorithm in algorithms:
-#     fitness_score = sum(item[1] for item in algorithm.runKNP())
-#     print(f"Fitness Score KNP [{algorithm.__class__.__name__}]: {fitness_score}")

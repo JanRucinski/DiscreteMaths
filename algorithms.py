@@ -143,13 +143,11 @@ class Algorithms:
         best_individual = max(population, key=fitness)
 
         # write generations_summary to a file
-        # name of file is generations_summary + current time without spaces + .txt
-        name_of_file = "generations_summary" + str(datetime.datetime.now()).replace(" ", "").replace(":", "").replace(".", "") + ".txt"
-        
-        # with open("generations/" + str(name_of_file), "w") as file:
-        #     file.write("Generation Max Min Average\n")
-        #     for line in generations_summary:
-        #         file.write(f"{line[0]} {line[1]} {line[2]} {line[3]} \n")
+        name = (f"{num_generations}, {population_size}, {mutation_rate}")
+        with open("generations/" + name +".csv", "w") as file:
+            file.write("Generation Max Min Average\n")
+            for line in generations_summary:
+                file.write(f"{line[0]} {line[1]} {line[2]} {line[3]}\n")
 
         return fitness(best_individual)
         
@@ -257,6 +255,46 @@ class Algorithms:
             solutions.append(profit)
         best_solution = max(solutions)
         return best_solution
+    
+    # Simulated Annealing --------------------------------
+    def runTTP_SA(self): #TBD
+        def fitness(individual):
+            total_profit = 0
+            current_city = individual[0][3]
+            knapsack_weight = individual[0][2]
+
+            for item in individual[1:]:
+                if knapsack_weight + item[2] <= self.capacity_of_knapsack:
+                    speed = calculate_speed(self.Vmax, self.Vmin, knapsack_weight, self.capacity_of_knapsack)
+                    distance = self.distance_matrix[current_city-1][item[3]-1]
+                    total_profit += item[1] - (distance / speed)
+                    current_city = item[3]
+                    knapsack_weight += item[2]
+            return total_profit
+
+        def simulated_annealing(individual):
+            temperature = 100
+            cooling_rate = 0.003
+            current_solution = individual
+            best_solution = current_solution
+            while temperature > 1:
+                new_solution = mutation([current_solution], 1)[0]
+                current_fitness = fitness(current_solution)
+                new_fitness = fitness(new_solution)
+                if new_fitness > current_fitness:
+                    current_solution = new_solution
+                else:
+                    if random.random() < (1 / (1 + (new_fitness - current_fitness) / temperature)):
+                        current_solution = new_solution
+                if fitness(current_solution) > fitness(best_solution):
+                    best_solution = current_solution
+                temperature *= 1 - cooling_rate
+            return best_solution
+
+        population = generate_population_knapsack(self.population_size, 
+                                                  self.items, self.capacity_of_knapsack)
+        best_individual = simulated_annealing(population[0])
+        return fitness(best_individual)
 
     def calculate_fitness(self, individual):
         distance_matrix = self.distance_matrix
